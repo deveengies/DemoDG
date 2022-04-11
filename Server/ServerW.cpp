@@ -44,6 +44,9 @@ using tcp = boost::asio::ip::tcp;       // from <boost/asio/ip/tcp.hpp>/** Read 
 
 typedef websocket::stream<beast::ssl_stream<tcp::socket&>> WebSock;
 
+const string listeClients = "../../workDir/liste_clients.txt";
+const string fileToSend = "../../workDir/toSend.txt";
+
 inline std::string file_to_string(const std::string& path) {
 	std::ostringstream buf;
 	std::ifstream input(path.c_str());
@@ -102,7 +105,7 @@ Clients clients;
 
 void read_liste_client()
 {
-	ifstream liste("g:\\tmp\\liste_clients.txt", ios::in | ios::binary);
+	ifstream liste(listeClients, ios::in | ios::binary);
 	if (liste)
 	{
 		string name;
@@ -121,7 +124,8 @@ void read_liste_client()
 void wait_all_connected_then_send_file()
 {
 	while (!clients.all_connected()) {}
-	clients.send_to_clients(file_to_string("g:\\tmp\\essai.txt"));
+	cout << "send " << fileToSend << " to clients ... " << endl;
+	clients.send_to_clients(file_to_string(fileToSend));
 }
 
 void read_forever(shared_ptr<WebSock> ws)

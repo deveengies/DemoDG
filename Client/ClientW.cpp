@@ -25,6 +25,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <string>
+#include <fstream>
 
 namespace beast = boost::beast;         // from <boost/beast.hpp>
 namespace http = beast::http;           // from <boost/beast/http.hpp>
@@ -33,96 +34,113 @@ namespace net = boost::asio;            // from <boost/asio.hpp>
 namespace ssl = boost::asio::ssl;       // from <boost/asio/ssl.hpp>
 using tcp = boost::asio::ip::tcp;       // from <boost/asio/ip/tcp.hpp>
 
+const std::string workDir = "../../workDir/";
+
 // Sends a WebSocket message and prints the response
+
+void string_to_file(std::string st, std::string path)
+{
+	std::ofstream file;
+	file.open(path);
+	file << st;
+	file.close();
+}
+
 int main(int argc, char** argv)
 {
-    try
-    {
-        // Check command line arguments.
-        if (argc != 4)
-        {
-            std::cerr <<
-                "Usage: websocket-client-sync-ssl <host> <port> <text>\n" <<
-                "Example:\n" <<
-                "    websocket-client-sync-ssl echo.websocket.org 443 \"Hello, world!\"\n";
-            return EXIT_FAILURE;
-        }
-        std::string host = argv[1];
-        auto const  port = argv[2];
-        auto const  text = argv[3];
+	try
+	{
+		// Check command line arguments.
+		if (argc != 4)
+		{
+			std::cerr <<
+				"Usage: websocket-client-sync-ssl <host> <port> <text>\n" <<
+				"Example:\n" <<
+				"    websocket-client-sync-ssl echo.websocket.org 443 \"Hello, world!\"\n";
+			return EXIT_FAILURE;
+		}
+		std::string host = argv[1];
+		auto const  port = argv[2];
+		auto const  ident = argv[3];
 
-        // The io_context is required for all I/O
-        net::io_context ioc;
+		// The io_context is required for all I/O
+		net::io_context ioc;
 
-        // The SSL context is required, and holds certificates
-        ssl::context ctx{ ssl::context::tlsv12_client };
+		// The SSL context is required, and holds certificates
+		ssl::context ctx{ ssl::context::tlsv12_client };
 
-        // This holds the root certificate used for verification
-        load_root_certificates(ctx);
+		// This holds the root certificate used for verification
+		load_root_certificates(ctx);
 
-        // These objects perform our I/O
-        tcp::resolver resolver{ ioc };
-        websocket::stream<beast::ssl_stream<tcp::socket>> ws{ ioc, ctx };
+		// These objects perform our I/O
+		tcp::resolver resolver{ ioc };
+		websocket::stream<beast::ssl_stream<tcp::socket>> ws{ ioc, ctx };
 
-        // Look up the domain name
-        auto const results = resolver.resolve(host, port);
+		// Look up the domain name
+		auto const results = resolver.resolve(host, port);
 
-        // Make the connection on the IP address we get from a lookup
-        auto ep = net::connect(get_lowest_layer(ws), results);
+		// Make the connection on the IP address we get from a lookup
+		auto ep = net::connect(get_lowest_layer(ws), results);
 
-        // Set SNI Hostname (many hosts need this to handshake successfully)
-        if (!SSL_set_tlsext_host_name(ws.next_layer().native_handle(), host.c_str()))
-            throw beast::system_error(
-                beast::error_code(
-                    static_cast<int>(::ERR_get_error()),
-                    net::error::get_ssl_category()),
-                "Failed to set SNI Hostname");
+		// Set SNI Hostname (many hosts need this to handshake successfully)
+		if (!SSL_set_tlsext_host_name(ws.next_layer().native_handle(), host.c_str()))
+			throw beast::system_error(
+				beast::error_code(
+					static_cast<int>(::ERR_get_error()),
+					net::error::get_ssl_category()),
+				"Failed to set SNI Hostname");
 
-        // Update the host_ string. This will provide the value of the
-        // Host HTTP header during the WebSocket handshake.
-        // See https://tools.ietf.org/html/rfc7230#section-5.4
-        host += ':' + std::to_string(ep.port());
+		// Update the host_ string. This will provide the value of the
+		// Host HTTP header during the WebSocket handshake.
+		// See https://tools.ietf.org/html/rfc7230#section-5.4
+		host += ':' + std::to_string(ep.port());
 
-        // Perform the SSL handshake
-        ws.next_layer().handshake(ssl::stream_base::client);
+		// Perform the SSL handshake
+		ws.next_layer().handshake(ssl::stream_base::client);
 
-        // Set a decorator to change the User-Agent of the handshake
-        ws.set_option(websocket::stream_base::decorator(
-            [](websocket::request_type& req)
-            {
-                req.set(http::field::user_agent,
-                    std::string(BOOST_BEAST_VERSION_STRING) +
-                    " websocket-client-coro");
-            }));
+		// Set a decorator to change the User-Agent of the handshake
+		ws.set_option(websocket::stream_base::decorator(
+			[](websocket::request_type& req)
+			{
+				req.set(http::field::user_agent,
+					std::string(BOOST_BEAST_VERSION_STRING) +
+					" websocket-client-coro");
+			}));
 
-        // Perform the websocket handshake
-        ws.handshake(host, "/");
+		// Perform the websocket handshake
+		ws.handshake(host, "/");
 
-        // Send the message
-        ws.write(net::buffer(std::string(text)));
+		// Send the message
+		ws.write(net::buffer(std::string(ident)));
 
-        for (;;) {
-            // This buffer will hold the incoming message
-            beast::flat_buffer buffer;
+		// This buffer will hold the incoming message
+		beast::flat_buffer buffer;
 
-            // Read a message into our buffer
-            ws.read(buffer);
+		// Read a message into our buffer
+		ws.read(buffer);
 
-            // The make_printable() function helps print a ConstBufferSequence
-            std::cout << beast::make_printable(buffer.data()) << std::endl;
-        }
-        // Close the WebSocket connection
-        ws.close(websocket::close_code::normal);
+		// write to file
+		std::string st = boost::beast::buffers_to_string(buffer.cdata());
+		std::string out = workDir + std::string(ident) + "_out.txt";
+		string_to_file(st, out);
 
-        // If we get here then the connection is closed gracefully
+		// The make_printable() function helps print a ConstBufferSequence
+		//std::cout << beast::make_printable(buffer.data()) << std::endl;
+		std::cout << "output file: " << out << std::endl;
 
-        
-        
-    }
-    catch (std::exception const& e)
-    {
-        std::cerr << "Error: " << e.what() << std::endl;
-        return EXIT_FAILURE;
-    }
-    return EXIT_SUCCESS;
+		// Close the WebSocket connection
+		std::cout << "close connection ..."<< std::endl;
+		ws.close(websocket::close_code::normal);
+
+		// If we get here then the connection is closed gracefully
+
+
+
+	}
+	catch (std::exception const& e)
+	{
+		std::cerr << "Error: " << e.what() << std::endl;
+		return EXIT_FAILURE;
+	}
+	return EXIT_SUCCESS;
 }

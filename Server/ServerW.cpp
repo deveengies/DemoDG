@@ -124,7 +124,7 @@ void read_liste_client()
 void wait_all_connected_then_send_file()
 {
 	while (!clients.all_connected()) {}
-	cout << "send " << fileToSend << " to clients ... " << endl;
+	cout << "\n\nsend " << fileToSend << " to clients ... " << endl;
 	clients.send_to_clients(file_to_string(fileToSend));
 }
 
@@ -212,6 +212,8 @@ int main(int argc, char* argv[])
 				"    websocket-server-sync-ssl 0.0.0.0 8080\n";
 			return EXIT_FAILURE;
 		}
+
+		cout << "Server Side..." << endl;
 
 		// get the list of allowed clients
 		read_liste_client();

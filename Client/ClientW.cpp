@@ -63,6 +63,8 @@ int main(int argc, char** argv)
 		auto const  port = argv[2];
 		auto const  ident = argv[3];
 
+		std::cout << "i am " << ident << std::endl;
+
 		// The io_context is required for all I/O
 		net::io_context ioc;
 
@@ -109,6 +111,7 @@ int main(int argc, char** argv)
 
 		// Perform the websocket handshake
 		ws.handshake(host, "/");
+		std::cout << "... connected to server" << std::endl;
 
 		// Send the message
 		ws.write(net::buffer(std::string(ident)));

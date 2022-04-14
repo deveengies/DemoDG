@@ -1,6 +1,4 @@
 
-
-
 echo Run Client ip=%1 port=%2 ident=%3
 cd ../Client/Debug/
 

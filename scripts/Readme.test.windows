@@ -1,0 +1,21 @@
+Afin de mettre en oeuvre le test:
+
+-En Lançant 'testFull.bat'
+5 fenêtres CmdTool vont s'ouvrir
+
+-Dans la première le Server va démarer
+.\runServer.bat 127.0.0.1 8282  -> 'Server 127.0.0.1 8282'
+
+-dans les 4 autre les 4 clients respectivement:
+.\runClient.bat 127.0.0.1 8282 joe -> 'Client 127.0.0.1 8282 joe'
+.\runClient.bat 127.0.0.1 8282 jack -> Client 127.0.0.1 8282 jack
+.\runClient.bat 127.0.0.1 8282 william-> Client 127.0.0.1 8282 william
+.\runClient.bat 127.0.0.1 8282 averell -> Client 127.0.0.1 8282 averell
+
+des messages de connection doivent apparaitre progressivement.
+A l'issu de la 4ème un fichier doit être envoyé par le server:
+<DirDemoDG>/DemoDG/worDir/toSend.txt
+et récuperé par les clients
+<DirDemoDG>/DemoDG/worDir/<client>_out.txt
+
+les scripts peuvent être utilisés independament.

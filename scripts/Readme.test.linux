@@ -1,0 +1,19 @@
+Afin de mettre en oeuvre le test:
+
+-demmarer 5 'gnome-terminal'
+-lancer le serveur dans l'une d'elle
+(cd <DirDemoDG/DemoDG/Server)
+./Server 127.0.0.1 8282
+
+-dans les 4 autre respectivement:
+(cd <DirDemoDG/DemoDG/Client)
+./Client 127.0.0.1 8282 joe
+./Client 127.0.0.1 8282 jack
+./Client 127.0.0.1 8282 william
+./Client 127.0.0.1 8282 averell
+
+des messages de connection doivent apparaitre progressivement.
+A l'issu de la 4ème un fichier doit être envoyé par le server:
+<DirDemoDG>/DemoDG/worDir/toSend.txt
+et récuperé par les clients
+<DirDemoDG>/DemoDG/worDir/<client>_out.txt

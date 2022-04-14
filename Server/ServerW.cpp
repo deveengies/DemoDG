@@ -13,6 +13,10 @@
 //
 //------------------------------------------------------------------------------
 
+//
+// 15/04/2022 adaptation temporaire de Eric Seigné (deveengies) dans le cadre d'une démo
+//
+
 #include "server_certificate.hpp"
 
 #include <boost/beast/core.hpp>

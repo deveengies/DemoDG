@@ -56,17 +56,18 @@ int main(int argc, char** argv)
 	try
 	{
 		// Check command line arguments.
-		if (argc != 4)
+		if (argc != 5)
 		{
 			std::cerr <<
 				"Usage: websocket-client-sync-ssl <host> <port> <text>\n" <<
 				"Example:\n" <<
-				"    websocket-client-sync-ssl echo.websocket.org 443 \"Hello, world!\"\n";
+				"    websocket-client-sync-ssl echo.websocket.org 443 myname mykey\n";
 			return EXIT_FAILURE;
 		}
 		std::string host = argv[1];
 		auto const  port = argv[2];
-		auto const  ident = argv[3];
+		auto const  ident = std::string(argv[3]);
+		auto const  key = std::string(argv[4]);
 
 		std::cout << "i am " << ident << std::endl;
 
@@ -119,7 +120,8 @@ int main(int argc, char** argv)
 		std::cout << "... connected to server" << std::endl;
 
 		// Send the message
-		ws.write(net::buffer(std::string(ident)));
+		std::string tosend(ident + " " + key);
+		ws.write(net::buffer(std::string(tosend)));
 
 		// This buffer will hold the incoming message
 		beast::flat_buffer buffer;

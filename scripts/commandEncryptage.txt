@@ -1,0 +1,5 @@
+openssl enc -e -aes-256-cbc -in ./sav/joe.txt -out ./joe.cry -k 1dalton1
+openssl enc -e -aes-256-cbc -in ./sav/jack.txt -out ./jack.cry -k 2dalton2
+openssl enc -e -aes-256-cbc -in ./sav/william.txt -out ./william.cry -k 3dalton3
+openssl enc -e -aes-256-cbc -in ./sav/averell.txt -out ./averell.cry -k 4dalton4
+

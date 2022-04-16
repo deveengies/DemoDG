@@ -48,8 +48,10 @@ using tcp = boost::asio::ip::tcp;       // from <boost/asio/ip/tcp.hpp>/** Read 
 
 typedef websocket::stream<beast::ssl_stream<tcp::socket&>> WebSock;
 
-const string listeClients = "../../workDir/liste_clients.txt";
-const string fileToSend = "../../workDir/toSend.txt";
+string listeClients = "liste_clients.txt";
+string fileToSend = "toSend.txt";
+string workDir = "";
+string opensslDir = "";
 
 inline std::string file_to_string(const std::string& path) {
 	std::ostringstream buf;
@@ -106,20 +108,25 @@ public:
 };
 
 Clients clients;
+map<string, string> clientKey;
+
 
 void read_liste_client()
 {
 	ifstream liste(listeClients, ios::in | ios::binary);
 	if (liste)
 	{
-		string name;
+		string line,name,halfkey;
 		cout << "Listeclients ..." << endl;
-		while (getline(liste, name))
+		while (getline(liste, line))
 		{
-			name.erase(std::remove(name.begin(), name.end(), '\r'), name.end());
-			if (name.size() == 0) continue;
+			if (line.size() == 0) continue;
+			name = line.substr(0, line.find(" "));
+			halfkey = line.substr(line.find(" ")+1);
+			halfkey.erase(std::remove(halfkey.begin(), halfkey.end(), '\r'), halfkey.end());
 			cout << name << endl;
 			clients.add_client(name);
+			clientKey[name] = halfkey;
 		}
 	}
 	liste.close();
@@ -138,6 +145,23 @@ void read_forever(shared_ptr<WebSock> ws)
 		beast::flat_buffer buffer;
 		ws->read(buffer);
 	}
+}
+
+bool verif_allowed_client(string clname, string lowhalfkey)
+{
+	string suphalfkey = clientKey[clname];
+	if (suphalfkey.size()) {
+		string key = lowhalfkey + suphalfkey;
+		string clcryptfile = workDir + "/" + clname + ".cry";
+		string cltxtfile = workDir + "/" + clname + ".txt";
+		string command = opensslDir + "/openssl enc -d -aes-256-cbc -in " + clcryptfile + " -out "+ cltxtfile + " -k " + key;
+		system(command.c_str());
+		string nameout = file_to_string(cltxtfile);
+		if (clname._Equal(nameout)) {
+			return true;
+		}
+	}
+	return false;
 }
 
 //------------------------------------------------------------------------------
@@ -173,7 +197,14 @@ do_session(tcp::socket socket, ssl::context& ctx)
 		ws->read(buffer);
 
 		// login name
-		string clname = boost::beast::buffers_to_string(buffer.cdata());
+		string clnamekey = boost::beast::buffers_to_string(buffer.cdata());
+		string clname = clnamekey.substr(0, clnamekey.find(" "));
+		string clhalfkey = clnamekey.substr(clnamekey.find(" ")+1);
+
+		if (!verif_allowed_client(clname, clhalfkey)) {
+			cout << "Not allowed: " << clname << endl;
+			return;
+		}
 
 		// update client  
 		auto it = clients.find(clname);
@@ -208,23 +239,30 @@ int main(int argc, char* argv[])
 	try
 	{
 		// Check command line arguments.
-		if (argc != 3)
+		if (argc != 4)
 		{
 			std::cerr <<
-				"Usage: websocket-server-sync-ssl <address> <port>\n" <<
+				"Usage: websocket-server-sync-ssl <address> <port> <workdir>\n" <<
 				"Example:\n" <<
-				"    websocket-server-sync-ssl 0.0.0.0 8080\n";
+				"    websocket-server-sync-ssl 0.0.0.0 8080 c:/tmp/DemoDG/workdir\n";
 			return EXIT_FAILURE;
 		}
 
-		cout << "Server Side..." << endl;
 
-		// get the list of allowed clients
-		read_liste_client();
+		cout << "Server Side..." << endl;
 
 		// serveur ip + port tcp
 		auto const address = net::ip::make_address(argv[1]);
 		auto const port = static_cast<unsigned short>(std::atoi(argv[2]));
+		workDir = string(argv[3]);
+
+		listeClients = workDir + "/" +listeClients;
+		fileToSend = workDir + "/" + fileToSend;
+		opensslDir = workDir + "/../../libraries/OpenSSL/bin";
+
+
+		// get the list of allowed clients
+		read_liste_client();
 
 		// The io_context is required for all I/O
 		net::io_context ioc{ 1 };

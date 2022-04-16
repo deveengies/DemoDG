@@ -19,6 +19,9 @@ Celles du Serveur sont plus conséquentes (liste de clients prédéfinie, envoi 
 
 Pour respecter, tant se peut, le CopyRight le depot GitHub 'DemoDG' est temporairement publique et sera privé à l'issue de la démo ...
 
+L'authentification du client:
+Lors de la connection,le client fournit son identifiant et une chaine de caractère correspondant à la première partie d'une chaine de caractère representant la clef d'encryptage /decriptage d'un fichier nommé avec son identifiant (extension'.cry') et contenant ce même identifiant (crypté donc).
+le serveur possède la seconde partie de la clef; Il associe les deux parties, decode le fichier et vérifie que le fichier originel contient bien l'identifiant du client. 
 
  
  ##############################
@@ -87,6 +90,11 @@ Installation sur Windows
 		§ cd <DirDemoDG>\boost_1_<subversion>_0 
 		§ ./bootstrap.bat
 		§ ./b2  --build-dir=build\x86 address-model=32 threading=multi --stagedir=.\bin\x86 --toolset=msvc -j 16 link=static,shared runtime-link=static,shared --variant=debug,release
+
+. Génération des binaires
+	. Ouvrir les deux projets Client/client.sln et Server/Server.sln separement.
+	. Si necessaire configurer les plateformes en 'Debug/x86'
+	. Lancer les générations
 
 ##############################
 

@@ -157,7 +157,7 @@ bool verif_allowed_client(string clname, string lowhalfkey)
 		string command = opensslDir + "/openssl enc -d -aes-256-cbc -in " + clcryptfile + " -out "+ cltxtfile + " -k " + key;
 		system(command.c_str());
 		string nameout = file_to_string(cltxtfile);
-		if (clname._Equal(nameout)) {
+		if (clname.compare(nameout) == 0) {
 			return true;
 		}
 	}
@@ -258,7 +258,11 @@ int main(int argc, char* argv[])
 
 		listeClients = workDir + "/" +listeClients;
 		fileToSend = workDir + "/" + fileToSend;
+		#if defined(__linux__)
+		opensslDir = "/usr/bin";
+		#else
 		opensslDir = workDir + "/../../libraries/OpenSSL/bin";
+		#endif
 
 
 		// get the list of allowed clients

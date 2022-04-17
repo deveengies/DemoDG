@@ -41,7 +41,8 @@ Les bibliothèques nécessaires sont :
 Installation sur Linux
 
 · Déployer DemoDG depuis GitHub dans le répertoire <DirDemoDG>
-· Si necessaire installer g++ et cmake
+· Si necessaire installer libssl-dev, g++ et cmake
+	o sudo apt install libssl-dev
 	o sudo apt install g++
 	o sudo apt install cmake
 · Installation de OpenSSL si ce n’est pas probablement fait lors de l’installation système (Vérification ubuntu :  « apt list openssl »)
@@ -49,6 +50,7 @@ Installation sur Linux
 · Installation de Boost - le repertoire de la librairie devra être placé dans <DirDemoDG> - 2 solutions:
 	1) Depuis un  depot google correspondant à l'aboutissement de l'installation de Boost sur linux Ubuntu x64
 		§ https://drive.google.com/file/d/1qVRXgcwE4xvLeC_alY21DihZ8xPoe2-k/view?usp=sharing 
+		ce fichier '.tgz' contient le répertoire 'libraries' à placer dans <DemoDG>
 	2) Suivre la procedure normale d'installation https://www.boost.org/users/download/
 		§ Download 
 		§  deploiement dans <DirDemoDG> 
@@ -85,6 +87,7 @@ Installation sur Windows
 · Installation de Boost - le répertoire de la libraire devra être placé également dans <DirDemoDG> - 2 solutions:
 	1) Depuis un  depot google correspondant à l'aboutissement de l'installation de Boost sur windows:
 		§ https://drive.google.com/file/d/1UjLfcWFww1AtSGWT5EuvTp9mZAlhtuiC/view?usp=sharing
+		ce fichier '.rar' contient le répertoire 'libraries' à placer dans <DemoDG>
 	2) Suivre la procedure normale d'installation https://www.boost.org/users/download/
 		§ Download , dézipper dans <DirDemoDG>
 		§ cd <DirDemoDG>\boost_1_<subversion>_0 
@@ -94,7 +97,7 @@ Installation sur Windows
 . Génération des binaires
 	. Ouvrir les deux projets Client/client.sln et Server/Server.sln separement.
 	. Si necessaire configurer les plateformes en 'Debug/x86'
-	. Lancer les générations
+	. Lancer les générations (Ctrl+Maj+B)
 
 ##############################
 

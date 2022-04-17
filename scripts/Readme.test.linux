@@ -3,14 +3,16 @@ Afin de mettre en oeuvre le test:
 -demmarer 5 'gnome-terminal'
 -lancer le serveur dans l'une d'elle
 (cd <DirDemoDG/DemoDG/Server)
-./Server 127.0.0.1 8282 ../../workdir
+<./Server ip port workdir>
+./Server 127.0.0.1 8282 ../workdir
 
 -dans les 4 autre respectivement:
 (cd <DirDemoDG/DemoDG/Client)
-./Client 127.0.0.1 8282 joe 1dal
-./Client 127.0.0.1 8282 jack 2dal
-./Client 127.0.0.1 8282 william 3dal
-./Client 127.0.0.1 8282 averell 4dal
+<./Client ipserver portserver identclient halfkey workdir>
+./Client 127.0.0.1 8282 joe 1dal ../workdir
+./Client 127.0.0.1 8282 jack 2dal ../workdir
+./Client 127.0.0.1 8282 william 3dal ../workdir
+./Client 127.0.0.1 8282 averell 4dal ../workdir
 
 des messages de connection doivent apparaitre progressivement.
 A l'issu de la 4ème un fichier doit être envoyé par le server:

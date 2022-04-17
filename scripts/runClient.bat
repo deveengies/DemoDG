@@ -10,5 +10,5 @@ IF NOT EXIST ".\libcrypto-1_1.dll" (
     copy ..\..\..\libraries\OpenSSL\bin\libcrypto-1_1.dll .
 )
 
-start cmd /k Client.exe  %1 %2 %3 %4
+start cmd /k Client.exe  %1 %2 %3 %4 %cd%/../../workdir
 cd ../../scripts

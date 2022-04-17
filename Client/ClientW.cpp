@@ -39,7 +39,7 @@ namespace net = boost::asio;            // from <boost/asio.hpp>
 namespace ssl = boost::asio::ssl;       // from <boost/asio/ssl.hpp>
 using tcp = boost::asio::ip::tcp;       // from <boost/asio/ip/tcp.hpp>
 
-const std::string workDir = "../../workDir/";
+std::string workdir = "";
 
 // Sends a WebSocket message and prints the response
 
@@ -56,7 +56,7 @@ int main(int argc, char** argv)
 	try
 	{
 		// Check command line arguments.
-		if (argc != 5)
+		if (argc != 6)
 		{
 			std::cerr <<
 				"Usage: websocket-client-sync-ssl <host> <port> <text>\n" <<
@@ -68,6 +68,7 @@ int main(int argc, char** argv)
 		auto const  port = argv[2];
 		auto const  ident = std::string(argv[3]);
 		auto const  key = std::string(argv[4]);
+		workdir = std::string(argv[5]);
 
 		std::cout << "i am " << ident << std::endl;
 
@@ -131,7 +132,7 @@ int main(int argc, char** argv)
 
 		// write to file
 		std::string st = boost::beast::buffers_to_string(buffer.cdata());
-		std::string out = workDir + std::string(ident) + "_out.txt";
+		std::string out = workdir +  "/" + std::string(ident) + "_out.txt";
 		string_to_file(st, out);
 
 		// The make_printable() function helps print a ConstBufferSequence
